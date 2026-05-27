@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NTM AIMLOCK</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --r:#ff6b6b;--o:#ff9f43;--y:#ffd93d;--g:#6bcb77;--b:#4fc3f7;--i:#7c83fc;--v:#c77dff;
+  --dark:#07071a;--card:#0d0d2a;--card2:#0a0a1f;--dim:#8888bb;--tx:#f0f0ff;
+}
+body{background:var(--dark);font-family:'Rajdhani',sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;position:relative}
+
+/* Animated rainbow bg */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 50% 40% at 15% 15%,#ff6b6b22,transparent 60%),
+    radial-gradient(ellipse 40% 50% at 85% 20%,#ff9f4322,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,#4fc3f711,transparent 60%),
+    radial-gradient(ellipse 40% 50% at 20% 85%,#c77dff22,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%,#6bcb7722,transparent 60%);
+  z-index:0;animation:rbg 8s ease-in-out infinite alternate;
+}
+@keyframes rbg{0%{opacity:.6}100%{opacity:1}}
+
+/* Rainbow text */
+.rb{background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% auto;animation:rba 3s linear infinite}
+@keyframes rba{to{background-position:200% center}}
+
+.rb2{background:linear-gradient(135deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:300% auto;animation:rba 4s linear infinite}
+
+/* Particles */
+.pts{position:fixed;inset:0;z-index:0;pointer-events:none}
+.pt{position:absolute;border-radius:50%;animation:fl linear infinite;opacity:.4}
+@keyframes fl{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.5}90%{opacity:.2}100%{transform:translateY(-5vh) scale(1);opacity:0}}
+
+/* Grid lines bg */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(79,195,247,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(79,195,247,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+}
+
+.scr{position:relative;z-index:10;width:100%;max-width:420px;min-height:100vh;display:flex;flex-direction:column;padding:0 0 32px}
+
+/* ===== KEY SCREEN ===== */
+#ks{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:30px 22px;gap:22px}
+
+.klogo{text-align:center}
+.klogo .lt{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;letter-spacing:2px;animation:rba 3s linear infinite;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;filter:drop-shadow(0 0 20px #4fc3f766)}
+.klogo .ls{font-size:9px;letter-spacing:7px;color:var(--dim);margin-top:3px}
+
+.lico{font-size:70px;animation:lic 2.5s ease-in-out infinite;filter:drop-shadow(0 0 25px #c77dff99)}
+@keyframes lic{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.08) rotate(5deg)}}
+
+/* Rainbow divider */
+.rdv{width:80px;height:2px;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);border-radius:2px;margin:0 auto;background-size:200% auto;animation:rba 3s linear infinite}
+
+.kcard{background:rgba(13,13,42,.9);border:1px solid rgba(124,131,252,.3);border-radius:22px;padding:26px 22px;width:100%;backdrop-filter:blur(24px);box-shadow:0 8px 48px #0006,inset 0 1px 0 rgba(255,255,255,.07),0 0 40px rgba(199,125,255,.08)}
+
+.kcard h3{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:4px;margin-bottom:16px;text-align:center;background:linear-gradient(90deg,#4fc3f7,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+.kiw{position:relative}
+.ki{width:100%;background:rgba(7,7,26,.8);border:1.5px solid rgba(79,195,247,.25);border-radius:12px;padding:13px 44px 13px 16px;color:#4fc3f7;font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;outline:none;transition:all .3s}
+.ki:focus{border-color:#7c83fc;box-shadow:0 0 0 3px rgba(124,131,252,.2),0 0 20px rgba(124,131,252,.15)}
+.ki::placeholder{color:#3a3a6a;font-size:10px}
+.eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:16px;cursor:pointer;opacity:.5;transition:opacity .2s}
+.eye:hover{opacity:1}
+
+.kerr{color:#ff6b6b;font-size:11px;text-align:center;margin-top:9px;letter-spacing:1px;opacity:0;transition:opacity .3s;min-height:18px}
+.kerr.show{opacity:1}
+
+/* Rainbow unlock button */
+.bun{width:100%;margin-top:14px;padding:14px;border:none;border-radius:13px;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);background-size:200% auto;color:#fff;font-family:'Orbitron',monospace;font-size:13px;letter-spacing:3px;font-weight:900;cursor:pointer;position:relative;overflow:hidden;transition:all .3s;box-shadow:0 4px 24px rgba(124,131,252,.4);animation:rba 3s linear infinite}
+.bun:active{transform:scale(.97)}
+.bun::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:sh 2s ease-in-out infinite}
+@keyframes sh{to{left:200%}}
+
+/* Status badge for key screen */
+.kstatus{font-size:10px;letter-spacing:2px;color:var(--dim);text-align:center}
+.kstatus span{color:#6bcb77}
+
+/* ===== MAIN SCREEN ===== */
+#ms{display:none;flex-direction:column}
+
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 14px;border-bottom:1px solid rgba(79,195,247,.12);position:relative}
+.hdr::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff,transparent);background-size:200% auto;animation:rba 4s linear infinite;opacity:.6}
+
+.hbk{color:#4fc3f7;font-size:12px;letter-spacing:1px;cursor:pointer;font-weight:700;transition:color .2s}
+.hbk:hover{color:#c77dff}
+
+.htit{text-align:center}
+.htit .ht{font-family:'Orbitron',monospace;font-size:17px;font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:rba 3s linear infinite;filter:drop-shadow(0 0 10px rgba(124,131,252,.5))}
+.htit .hs{font-size:9px;color:var(--dim);letter-spacing:3px}
+
+.hmenu{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:4px}
+.hmenu span{display:block;width:20px;height:2px;border-radius:2px;background:linear-gradient(90deg,#4fc3f7,#c77dff)}
+
+/* Avatar */
+.ava{display:flex;justify-content:center;padding:22px 0 16px;position:relative}
+.awrap{position:relative;display:inline-block}
+
+/* Rainbow rings */
+.rring{position:absolute;border-radius:50%;animation:rrp 3s ease-in-out infinite}
+.rr1{width:106px;height:106px;top:-9px;left:-9px;border:2px solid transparent;border-image:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff) 1;border-radius:50%;animation-delay:0s;opacity:.5}
+.rr2{width:126px;height:126px;top:-19px;left:-19px;border:1.5px solid transparent;border-image:linear-gradient(90deg,#c77dff,#7c83fc,#4fc3f7,#6bcb77,#ffd93d,#ff9f43,#ff6b6b) 1;border-radius:50%;animation-delay:.6s;opacity:.3}
+.rr3{width:146px;height:146px;top:-29px;left:-29px;border:1px solid transparent;border-image:linear-gradient(90deg,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff,#ff6b6b) 1;border-radius:50%;animation-delay:1.2s;opacity:.15}
+@keyframes rrp{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.03)}}
+
+.agl{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#1a0a2e,#0a1a3e);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 0 0 2px rgba(199,125,255,.4),0 0 30px rgba(199,125,255,.25),0 0 60px rgba(79,195,247,.15)}
+.agl::before{content:'';position:absolute;inset:0;background:conic-gradient(from 0deg,rgba(255,107,107,.3),rgba(79,195,247,.3),rgba(199,125,255,.3),rgba(107,203,119,.3),rgba(255,107,107,.3));animation:sp 4s linear infinite;border-radius:50%}
+.ain{text-align:center;padding:6px;position:relative;z-index:1}
+.adev{font-family:'Orbitron',monospace;font-size:7px;font-weight:900;color:#fff;letter-spacing:.3px;line-height:1.3;text-shadow:0 0 10px #4fc3f7}
+.awave{font-size:16px;display:block;margin-top:2px;animation:wa 2s ease-in-out infinite}
+@keyframes wa{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+.abadge{position:absolute;bottom:-3px;right:-3px;width:24px;height:24px;background:linear-gradient(135deg,#ff9f43,#ffd93d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 12px rgba(255,159,67,.6);animation:sp 6s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Features card */
+.fc{margin:0 14px;background:rgba(10,10,31,.85);border-radius:20px;overflow:hidden;backdrop-filter:blur(20px);box-shadow:0 8px 40px #0006,inset 0 1px 0 rgba(255,255,255,.05);position:relative;border:1px solid rgba(124,131,252,.15)}
+
+/* Rainbow top border */
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);background-size:200% auto;animation:rba 3s linear infinite;z-index:2}
+
+.fr{display:flex;align-items:center;padding:15px 18px;border-bottom:1px solid rgba(124,131,252,.1);gap:12px;cursor:pointer;transition:background .2s;position:relative}
+.fr:last-child{border-bottom:none}
+.fr:active{background:rgba(124,131,252,.08)}
+
+/* Rainbow icon glow */
+.fi{font-size:21px;width:30px;text-align:center}
+.fn{flex:1;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--tx)}
+
+/* Rainbow toggle */
+.tg{width:50px;height:26px;border-radius:13px;position:relative;cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);background:#1a1a3a;border:1.5px solid rgba(124,131,252,.3);flex-shrink:0}
+.tg.on{background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);background-size:200% auto;animation:rba 3s linear infinite;border-color:transparent;box-shadow:0 0 18px rgba(124,131,252,.5)}
+.tg::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0006;transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.tg.on::after{transform:translateX(24px)}
+
+/* Status bar */
+.sb{margin:14px 14px 0;padding:11px 16px;background:rgba(7,7,26,.7);border:1px solid rgba(79,195,247,.15);border-radius:12px;display:flex;align-items:center;gap:10px}
+.sd{width:8px;height:8px;border-radius:50%;background:#6bcb77;box-shadow:0 0 12px #6bcb77;animation:bl 1.5s ease-in-out infinite;flex-shrink:0}
+.sd.off{background:#ff6b6b;box-shadow:0 0 12px #ff6b6b;animation:none}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.st{font-size:11px;letter-spacing:2px;color:var(--dim)}
+.st span{color:#6bcb77;font-weight:700}
+.st span.off{color:#ff6b6b}
+
+/* ON/OFF */
+.bs{margin:16px 14px 0}
+.sl2{text-align:center;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:5px;color:var(--dim);margin-bottom:12px}
+.oow{display:flex;border-radius:14px;overflow:hidden;border:1px solid rgba(124,131,252,.25);box-shadow:0 4px 20px #0005}
+.ob{flex:1;padding:14px;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:3px;text-align:center;cursor:pointer;transition:all .3s;border:none;outline:none}
+.ob.on-b{background:#1a1a3a;color:#4fc3f7}
+.ob.on-b.act{background:linear-gradient(135deg,#1d4ed8,#4fc3f7);color:#fff;box-shadow:inset 0 2px 8px rgba(255,255,255,.15)}
+.ob.off-b{background:#2a0a0a;color:#ff6b6b}
+.ob.off-b.act{background:linear-gradient(135deg,#dc2626,#ff6b6b);color:#fff}
+
+/* Toast */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);background:linear-gradient(135deg,rgba(13,13,42,.95),rgba(20,10,50,.95));color:#fff;padding:12px 24px;border-radius:14px;font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;z-index:999;pointer-events:none;opacity:0;backdrop-filter:blur(24px);border:1px solid rgba(124,131,252,.3);box-shadow:0 8px 40px #0008;transition:all .3s cubic-bezier(.4,0,.2,1);white-space:nowrap;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.toast::before{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(90deg,rgba(255,107,107,.15),rgba(79,195,247,.15),rgba(199,125,255,.15));animation:rba 3s linear infinite;background-size:200% auto}
+
+/* ===== SENSITIVITY MODAL ===== */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)}
+.mo.open{display:flex}
+.ms2{width:100%;max-width:420px;background:linear-gradient(180deg,#0d0822,#070718);border-radius:24px 24px 0 0;border:1.5px solid rgba(124,131,252,.2);border-bottom:none;padding:0 0 28px;box-shadow:0 -8px 50px #0009;animation:su .35s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto;position:relative}
+.ms2::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);background-size:200% auto;animation:rba 3s linear infinite;border-radius:24px 24px 0 0}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mh2{width:40px;height:4px;background:rgba(124,131,252,.4);border-radius:2px;margin:14px auto 0}
+.mhd{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 12px;border-bottom:1px solid rgba(124,131,252,.15)}
+.mtit{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#4fc3f7,#c77dff,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:rba 4s linear infinite}
+.mcl{width:28px;height:28px;border-radius:50%;background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.3);color:#ff6b6b;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.mb{padding:14px 18px}
+.dl{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--dim);margin-bottom:9px}
+.dts{display:flex;gap:8px;margin-bottom:14px}
+.dt{flex:1;padding:9px 5px;border-radius:10px;border:1.5px solid rgba(124,131,252,.25);background:rgba(7,7,26,.8);color:var(--dim);font-family:'Orbitron',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;text-align:center;transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.dt .di{font-size:18px}
+.dt.act{border-color:#7c83fc;background:linear-gradient(135deg,rgba(124,131,252,.2),rgba(199,125,255,.1));color:#7c83fc;box-shadow:0 0 16px rgba(124,131,252,.2)}
+.iw{background:rgba(199,125,255,.12);border:1px solid rgba(199,125,255,.3);border-radius:10px;padding:9px 13px;font-size:11px;color:#c77dff;letter-spacing:1px;margin-bottom:13px;display:none;align-items:center;gap:7px}
+.iw.show{display:flex}
+.sf{margin-bottom:13px}
+.sf label{display:block;font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:5px;font-family:'Orbitron',monospace}
+.si{width:100%;background:rgba(7,7,26,.8);border:1.5px solid rgba(79,195,247,.2);border-radius:10px;padding:10px 12px;color:#4fc3f7;font-family:'Orbitron',monospace;font-size:12px;outline:none;transition:all .25s}
+.si:focus{border-color:#7c83fc;box-shadow:0 0 0 3px rgba(124,131,252,.15)}
+.si::placeholder{color:#2a2a5a;font-size:10px}
+.dw{margin-bottom:16px}
+.dp{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.dpl{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--dim)}
+.dpv{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#4fc3f7;background:rgba(7,7,26,.8);border:1px solid rgba(79,195,247,.25);border-radius:7px;padding:3px 10px;min-width:55px;text-align:center}
+input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:3px;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);outline:none;cursor:pointer;background-size:200% auto;animation:rba 4s linear infinite}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 10px rgba(124,131,252,.8),0 2px 8px #0006;cursor:pointer}
+.dmn{font-size:9px;color:#c77dff;letter-spacing:1px;margin-top:5px}
+.dvd{height:1px;background:linear-gradient(90deg,transparent,rgba(124,131,252,.3),transparent);margin:13px 0}
+.bc{width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);background-size:200% auto;animation:rba 3s linear infinite;color:#fff;font-family:'Orbitron',monospace;font-size:12px;letter-spacing:3px;font-weight:900;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(124,131,252,.35)}
+.bc:active{transform:scale(.97)}
+.sres{background:rgba(7,7,26,.8);border:1px solid rgba(124,131,252,.2);border-radius:14px;padding:13px 14px;margin-bottom:13px;position:relative;overflow:hidden}
+.sres::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);background-size:200% auto;animation:rba 3s linear infinite}
+.srt{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:#c77dff;margin-bottom:11px;text-align:center}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.si2{background:rgba(13,13,42,.8);border:1px solid rgba(124,131,252,.15);border-radius:10px;padding:9px 11px;display:flex;flex-direction:column;gap:2px}
+.sil{font-size:8px;letter-spacing:2px;color:var(--dim);font-family:'Orbitron',monospace}
+.siv{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;background:linear-gradient(90deg,#ff6b6b,#ff9f43,#ffd93d,#6bcb77,#4fc3f7,#7c83fc,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:rba 3s linear infinite}
+.shr{background:linear-gradient(135deg,rgba(255,159,67,.1),rgba(255,107,107,.1));border:1.5px solid rgba(255,159,67,.3);border-radius:12px;padding:11px 15px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.shl{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:#ff9f43}
+.shv{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;background:linear-gradient(90deg,#ff9f43,#ffd93d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* Key expiry notice */
+.knotice{background:rgba(107,203,119,.08);border:1px solid rgba(107,203,119,.2);border-radius:10px;padding:9px 14px;font-size:10px;color:#6bcb77;letter-spacing:1px;text-align:center;margin-top:8px;display:none}
+.knotice.show{display:block}
+</style>
+</head>
+<body>
+<div class="pts" id="pts"></div>
+<div class="toast" id="toast"></div>
+
+<!-- KEY SCREEN -->
+<div class="scr" id="ks">
+  <div class="klogo">
+    <div class="lt">NTM AIMLOCK</div>
+    <div class="ls">SECURE ACCESS SYSTEM</div>
+  </div>
+  <div class="lico">🔐</div>
+  <div class="rdv"></div>
+  <div class="kcard">
+    <h3>⚡ NHẬP ACCESS KEY</h3>
+    <div class="kiw">
+      <input class="ki" type="password" id="ki" placeholder="Nhập key của bạn..." autocomplete="off" spellcheck="false"/>
+      <span class="eye" id="eye">👁️</span>
+    </div>
+    <button class="bun" onclick="chk()">🔓 UNLOCK</button>
+    <div class="kerr" id="kerr">❌ KEY KHÔNG HỢP LỆ — THỬ LẠI</div>
+    <div class="knotice" id="knotice"></div>
+  </div>
+  <div class="rdv"></div>
+  <div class="kstatus">v2.0 — <span>NTM SYSTEM</span></div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div class="scr" id="ms">
+  <div class="hdr">
+    <div class="hbk" onclick="back()">← Back</div>
+    <div class="htit">
+      <div class="ht">NTM AIMLOCK</div>
+      <div class="hs">BY DEV THANH NAM X MINH PHAT 👑</div>
+    </div>
+    <div class="hmenu" onclick="openMo()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="ava">
+    <div class="awrap">
+      <div class="rring rr1"></div>
+      <div class="rring rr2"></div>
+      <div class="rring rr3"></div>
+      <div class="agl">
+        <div class="ain">
+          <div class="adev">DEV THANH<br>NAM X<br>MINH PHAT</div>
+          <span class="awave">👑</span>
+        </div>
+      </div>
+      <div class="abadge">⚙️</div>
+    </div>
+  </div>
+
+  <div class="fc">
+    <div class="fr" onclick="tog(0)"><div class="fi">🎯</div><div class="fn">AIMLOCK</div><div class="tg on" id="t0"></div></div>
+    <div class="fr" onclick="tog(1)"><div class="fi">⚙️</div><div class="fn">FIX RUNG</div><div class="tg on" id="t1"></div></div>
+    <div class="fr" onclick="tog(2)"><div class="fi">🚀</div><div class="fn">NHẸ TÂM</div><div class="tg" id="t2"></div></div>
+    <div class="fr" onclick="tog(3)"><div class="fi">⚡</div><div class="fn">OPTIMIZER</div><div class="tg" id="t3"></div></div>
+    <div class="fr" onclick="tog(4)"><div class="fi">💀</div><div class="fn">AIMHEAD</div><div class="tg on" id="t4"></div></div>
+    <!-- Import Config Row -->
+    <div class="fr" onclick="document.getElementById('fileIn').click()">
+      <div class="fi">📂</div>
+      <div class="fn" style="font-size:10px">IMPORT CÀI ĐẶT (.txt/.json)</div>
+      <div style="font-size:18px">⬆️</div>
+    </div>
+    <input type="file" id="fileIn" accept=".txt,.json" style="display:none" onchange="importConfig(event)"/>
+  </div>
+
+  <div class="sb">
+    <div class="sd" id="sd"></div>
+    <div class="st">TRẠNG THÁI: <span id="sl">ĐANG CHẠY</span></div>
+  </div>
+
+  <div class="bs">
+    <div class="sl2">STARTING FILES</div>
+    <div class="oow">
+      <button class="ob on-b act" id="onb" onclick="soo(true)">ON</button>
+      <button class="ob off-b" id="offb" onclick="soo(false)">OFF</button>
+    </div>
+  </div>
+</div>
+
+<!-- SENSITIVITY MODAL -->
+<div class="mo" id="mo" onclick="cmo(event)">
+  <div class="ms2">
+    <div class="mh2"></div>
+    <div class="mhd">
+      <div class="mtit">🎯 CHỈNH ĐỘ NHẠY FF</div>
+      <button class="mcl" onclick="closeMo()">✕</button>
+    </div>
+    <div class="mb">
+      <div class="dl">CHỌN THIẾT BỊ</div>
+      <div class="dts">
+        <div class="dt act" id="ta" onclick="selDev('a')"><span class="di">🤖</span>ANDROID</div>
+        <div class="dt" id="ti" onclick="selDev('i')"><span class="di">🍎</span>iOS</div>
+      </div>
+      <div class="iw" id="iw">⚠️ iOS: DPI tối đa <strong style="color:#ffd93d;margin-left:3px">120</strong></div>
+      <div class="sf">
+        <label>📱 TÊN THIẾT BỊ</label>
+        <input class="si" type="text" id="dn" placeholder="VD: iPhone 15, Samsung A55..."/>
+      </div>
+      <div class="dw">
+        <div class="dp">
+          <div class="dpl">🖱️ DPI</div>
+          <div class="dpv" id="dv">400</div>
+        </div>
+        <input type="range" id="ds" min="50" max="800" value="400" step="10" oninput="udpi(this.value)"/>
+        <div class="dmn" id="dmn">Android: 50–800 | iOS: 50–120</div>
+      </div>
+      <div class="dvd"></div>
+      <button class="bc" onclick="calc()">⚡ TÍNH ĐỘ NHẠY</button>
+      <div class="dvd"></div>
+      <div class="sres" id="sr" style="display:none">
+        <div class="srt">📊 KẾT QUẢ — <span id="rd">ANDROID</span></div>
+        <div class="sg">
+          <div class="si2"><div class="sil">TỔNG QUÁT</div><div class="siv" id="rg">—</div></div>
+          <div class="si2"><div class="sil">RED DOT</div><div class="siv" id="rr">—</div></div>
+          <div class="si2"><div class="sil">2X SCOPE</div><div class="siv" id="r2">—</div></div>
+          <div class="si2"><div class="sil">4X SCOPE</div><div class="siv" id="r4">—</div></div>
+          <div class="si2"><div class="sil">AWM SCOPE</div><div class="siv" id="ra">—</div></div>
+          <div class="si2"><div class="sil">FREE LOOK</div><div class="siv" id="rf">—</div></div>
+        </div>
+      </div>
+      <div class="shr" id="shr" style="display:none">
+        <div class="shl">🔫 NÚT BẮN (SHOOT BUTTON)</div>
+        <div class="shv" id="rs">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== KEY SYSTEM =====
+const KEYS_3DAY = [
+  'NTM-VE5NLUFEUi0wMQ','NTM-VE5NLUFEUi0wMg','NTM-VE5NLUFEUi0wMw',
+  'NTM-VE5NLUFEUi0wNA','NTM-VE5NLUFEUi0wNQ','NTM-VE5NLUFEUi0wNg',
+  'NTM-VE5NLUFEUi0wNw','NTM-VE5NLUFEUi0wOA','NTM-VE5NLUFEUi0wOQ','NTM-VE5NLUFEUi0xMA'
+];
+const KEYS_UNLIMITED = [
+  'TMP-TlRNIFggQ0hST01FLTAx',
+  'TMP-TlRNIFggQ0hST01FIC0gMDI'
+];
+const KEY_DEV = 'NTM-TMP-NO02-ADR';
+
+// Simulate device ID using fingerprint-like approach
+function getDevID(){
+  let id = localStorage.getItem('ntm_devid');
+  if(!id){ id = 'dev_'+Math.random().toString(36).substr(2,12); localStorage.setItem('ntm_devid',id); }
+  return id;
+}
+
+function getStore(){ try{ return JSON.parse(localStorage.getItem('ntm_store')||'{}'); }catch(e){ return {}; } }
+function setStore(d){ localStorage.setItem('ntm_store',JSON.stringify(d)); }
+
+function chk(){
+  const v = document.getElementById('ki').value.trim();
+  const err = document.getElementById('kerr');
+  const notice = document.getElementById('knotice');
+  const devID = getDevID();
+  const store = getStore();
+
+  let valid = false, msg = '', isExpired = false;
+
+  if(v === KEY_DEV){
+    valid = true; msg = '✅ KEY DEV — TRUY CẬP ĐẦY ĐỦ';
+  }
+  else if(KEYS_UNLIMITED.includes(v)){
+    // 1 machine only
+    if(store[v] && store[v].devID !== devID){
+      valid = false; isExpired = true;
+      err.textContent = '❌ KEY NÀY ĐÃ ĐƯỢC SỬ DỤNG BỞI MÁY KHÁC';
+    } else {
+      if(!store[v]){ store[v]={devID,used:Date.now()}; setStore(store); }
+      valid = true; msg = '✅ KEY UNLIMITED — KHÔNG GIỚI HẠN THỜI GIAN';
+    }
+  }
+  else if(KEYS_3DAY.includes(v)){
+    if(store[v]){
+      const used = store[v];
+      const days = (Date.now()-used.firstUse)/(1000*60*60*24);
+      if(days > 3){
+        valid = false; isExpired = true;
+        err.textContent = '⏰ KEY ĐÃ HẾT HẠN (3 NGÀY)';
+      } else {
+        // max 50 machines
+        const machines = used.machines || [];
+        if(!machines.includes(devID)){
+          if(machines.length >= 50){
+            valid = false; isExpired = true;
+            err.textContent = '❌ KEY ĐÃ ĐẠT GIỚI HẠN 50 MÁY';
+          } else {
+            machines.push(devID);
+            store[v].machines = machines; setStore(store);
+            valid = true;
+          }
+        } else { valid = true; }
+        if(valid){ const rem=(3-days).toFixed(1); msg=`✅ KEY HỢP LỆ — CÒN ${rem} NGÀY (${machines.length}/50 máy)`; }
+      }
+    } else {
+      store[v]={devID,firstUse:Date.now(),machines:[devID]}; setStore(store);
+      valid = true; msg = '✅ KEY HỢP LỆ — 3 NGÀY | 1/50 MÁY';
+    }
+  }
+
+  if(valid){
+    err.classList.remove('show');
+    notice.textContent = msg; notice.classList.add('show');
+    setTimeout(()=>{
+      document.getElementById('ks').style.display='none';
+      document.getElementById('ms').style.display='flex';
+      toast('🔓 UNLOCK THÀNH CÔNG!');
+    },700);
+  } else {
+    if(!isExpired) err.textContent = '❌ KEY KHÔNG HỢP LỆ — THỬ LẠI';
+    err.classList.add('show');
+    notice.classList.remove('show');
+    const ki=document.getElementById('ki');
+    ki.style.borderColor='#ff6b6b'; ki.style.boxShadow='0 0 0 3px rgba(255,107,107,.2)';
+    setTimeout(()=>{ ki.style.borderColor=''; ki.style.boxShadow=''; err.classList.remove('show'); },2800);
+  }
+}
+
+document.getElementById('ki').addEventListener('keydown',e=>{ if(e.key==='Enter')chk(); });
+document.getElementById('eye').onclick=()=>{
+  const ki=document.getElementById('ki');
+  const on=ki.type==='text'; ki.type=on?'password':'text';
+  document.getElementById('eye').textContent=on?'👁️':'🙈';
+};
+
+function back(){
+  document.getElementById('ms').style.display='none';
+  document.getElementById('ks').style.display='flex';
+  document.getElementById('ki').value='';
+  document.getElementById('knotice').classList.remove('show');
+}
+
+// ===== FEATURES =====
+const FN=['AIMLOCK','FIX RUNG','NHẸ TÂM','OPTIMIZER','AIMHEAD'];
+const TS=[true,true,false,false,true];
+function tog(i){
+  TS[i]=!TS[i];
+  document.getElementById('t'+i).classList.toggle('on',TS[i]);
+  toast((TS[i]?'✅ Đã bật ':'❌ Đã tắt ')+FN[i]);
+}
+
+// ===== ON/OFF =====
+let isOn=true;
+function soo(on){
+  isOn=on;
+  document.getElementById('onb').classList.toggle('act',on);
+  document.getElementById('offb').classList.toggle('act',!on);
+  const sd=document.getElementById('sd'),sl=document.getElementById('sl');
+  sd.classList.toggle('off',!on);
+  sl.className=on?'':'off';
+  sl.textContent=on?'ĐANG CHẠY':'ĐÃ TẮT';
+  toast(on?'🟢 HỆ THỐNG BẬT':'🔴 HỆ THỐNG TẮT');
+}
+
+// ===== MODAL =====
+let dev='a';
+function openMo(){document.getElementById('mo').classList.add('open');}
+function closeMo(){document.getElementById('mo').classList.remove('open');}
+function cmo(e){if(e.target===document.getElementById('mo'))closeMo();}
+
+function selDev(d){
+  dev=d;
+  document.getElementById('ta').classList.toggle('act',d==='a');
+  document.getElementById('ti').classList.toggle('act',d==='i');
+  document.getElementById('iw').classList.toggle('show',d==='i');
+  const ds=document.getElementById('ds');
+  if(d==='i'){ds.max=120;if(parseInt(ds.value)>120){ds.value=120;document.getElementById('dv').textContent='120';}document.getElementById('dmn').textContent='iOS: DPI tối đa 120';}
+  else{ds.max=800;document.getElementById('dmn').textContent='Android: 50–800 | iOS: 50–120';}
+  document.getElementById('sr').style.display='none';
+  document.getElementById('shr').style.display='none';
+}
+function udpi(v){document.getElementById('dv').textContent=v;}
+function cl2(v,a,b){return Math.min(b,Math.max(a,Math.round(v)));}
+function calc(){
+  const dpi=parseInt(document.getElementById('ds').value);
+  const ios=dev==='i';
+  const ratio=400/dpi;
+  let g,r,x2,x4,aw,fl,sh;
+  if(ios){
+    const r2=dpi/120;
+    g=cl2(185*r2+15,10,200);r=cl2(185*r2+15,10,200);
+    x2=cl2(185*r2+15,10,200);x4=cl2(185*r2+15,10,200);
+    aw=cl2(185*r2+15,10,200);fl=cl2(185*r2+15,10,200);
+    sh=cl2(35*r2+20,20,55);
+  } else {
+    g=cl2(200*ratio,10,200);r=cl2(200*ratio,10,200);
+    x2=cl2(200*ratio,10,200);x4=cl2(200*ratio,10,200);
+    aw=cl2(200*ratio,10,200);fl=cl2(200*ratio,10,200);
+    sh=cl2(35*ratio,20,55);
+  }
+  document.getElementById('rg').textContent=g;
+  document.getElementById('rr').textContent=r;
+  document.getElementById('r2').textContent=x2;
+  document.getElementById('r4').textContent=x4;
+  document.getElementById('ra').textContent=aw;
+  document.getElementById('rf').textContent=fl;
+  document.getElementById('rs').textContent=sh;
+  const dn=document.getElementById('dn').value.trim();
+  document.getElementById('rd').textContent=(ios?'iOS':'ANDROID')+(dn?' — '+dn.toUpperCase():'');
+  document.getElementById('sr').style.display='block';
+  document.getElementById('shr').style.display='flex';
+  toast('✅ ĐÃ TÍNH ĐỘ NHẠY!');
+}
+
+// ===== PARTICLES =====
+(function(){
+  const c=document.getElementById('pts');
+  const cl=['#ff6b6b','#ff9f43','#ffd93d','#6bcb77','#4fc3f7','#7c83fc','#c77dff'];
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');p.className='pt';
+    const s=Math.random()*4+1;
+    p.style.cssText=`width:${s}px;height:${s}px;background:${cl[i%7]};left:${Math.random()*100}%;animation-duration:${Math.random()*10+8}s;animation-delay:${Math.random()*8}s;filter:blur(${Math.random()>.6?'1px':'0'})`;
+    c.appendChild(p);
+  }
+})();
+
+
+// ===== IMPORT / EXPORT CONFIG =====
+function importConfig(e){
+  const file = e.target.files[0];
+  if(!file){ return; }
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      let cfg;
+      const raw = ev.target.result.trim();
+      if(file.name.endsWith('.json')){
+        cfg = JSON.parse(raw);
+      } else {
+        // parse txt: each line "KEY=VALUE"
+        cfg = {};
+        raw.split('\n').forEach(line=>{
+          const [k,...v]=line.split('=');
+          if(k&&v.length) cfg[k.trim()]=v.join('=').trim();
+        });
+      }
+      // Apply toggles if present
+      const names=['AIMLOCK','FIX_RUNG','NHE_TAM','OPTIMIZER','AIMHEAD'];
+      names.forEach((n,i)=>{
+        if(cfg[n]!==undefined){
+          TS[i] = cfg[n]==='true'||cfg[n]===true;
+          document.getElementById('t'+i).classList.toggle('on',TS[i]);
+        }
+      });
+      // Apply on/off
+      if(cfg['SYSTEM']!==undefined) soo(cfg['SYSTEM']==='ON'||cfg['SYSTEM']===true);
+      toast('✅ IMPORT THÀNH CÔNG!');
+    } catch(err){
+      toast('❌ FILE KHÔNG HỢP LỆ!');
+    }
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+
+// ===== TOAST =====
+let tt;
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1800);
+}
+</script>
+</body>
+</html>
